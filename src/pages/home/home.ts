@@ -44,9 +44,9 @@ export class HomePage {
 
     this.fcm.onNotification().subscribe(data => {
       if (data.wasTapped) {
-        this.notifAlert();
+        this.notifAlert(data.receiver);
       } else {
-        this.notifAlert();
+        this.notifAlert(data.receiver);
       };
     });
     
@@ -67,7 +67,7 @@ export class HomePage {
   }
 
 
-  notifAlert(){
+  notifAlert(receiverID){
     let alert = this.alertCtrl.create({
       title: 'Request!',
       message: 'Do you want to accept?',
@@ -76,20 +76,25 @@ export class HomePage {
           text: 'Accept',
           handler: () => {
             //save accept
-            this.notifProvider.storeAccept(this.uid);
+            this.notifProvider.storeAccept(this.uid,receiverID)
+            .then( () => {
+
+            });
           }
         },
         {
           text: 'Reject',
           handler: () => {
             //save reject
-            this.notifProvider.storeDecline(this.uid);
+            this.notifProvider.storeDecline(this.uid,receiverID);
           }
         }
       ]
     });
     alert.present();
   }
+
+
 
   userSelected(user){
 
@@ -99,7 +104,7 @@ export class HomePage {
           {
             text: 'Request',
             handler: () => {
-              this.notifProvider.sendRequest(user.payload.val().token);
+              this.notifProvider.sendRequest(user.payload.val().token,user.payload.key);
             }
           },
           {

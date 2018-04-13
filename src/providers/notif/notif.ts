@@ -16,7 +16,7 @@ export class NotifProvider {
   constructor(private afdb:AngularFireDatabase, private afAuth:AngularFireAuth,public http: HttpClient) {
   }
 
-  sendRequest(token){
+  sendRequest(token,receiverID){
       let body = {
         "notification": {
           "title": "You have a parking request!",
@@ -26,7 +26,7 @@ export class NotifProvider {
           "icon": "fcm_push_icon"
         },
         "data": {
-          "param1": "",
+          "receiver":receiverID,
           "param2": "",
         },
         "to": token,
@@ -42,16 +42,18 @@ export class NotifProvider {
   }
 
 
-  storeAccept(id){
+  storeAccept(id,receiverID){
     return this.afdb.list(`request`).push({
       user_id:id,
+      receiver_id:receiverID,
       request:'accepted'
     });
   }
 
-  storeDecline(id){
+  storeDecline(id,receiverID){
     return this.afdb.list(`request`).push({
       user_id:id,
+      receiver_id:receiverID,
       request:'declined'
     });
   }
