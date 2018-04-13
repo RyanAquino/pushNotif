@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, ActionSheetController } from 'ionic-angular';
+import { NavController, ActionSheetController, AlertController } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { NotifProvider } from '../../providers/notif/notif';
@@ -20,7 +20,7 @@ export class HomePage {
   notif;
   users:Observable<any[]>;
 
-  constructor(public actionSheetCtrl: ActionSheetController, private afAuth:AngularFireAuth,private authProvider:AuthProvider,private fcm:FCM,private notifProvider:NotifProvider,public navCtrl: NavController, public afdb: AngularFireDatabase) {
+  constructor(public actionSheetCtrl: ActionSheetController, private afAuth:AngularFireAuth,private authProvider:AuthProvider,private fcm:FCM,private notifProvider:NotifProvider,public navCtrl: NavController, public afdb: AngularFireDatabase, private alertCtrl:AlertController) {
     //?? where to put //working
     this.uid = this.afAuth.auth.currentUser.uid;
   }
@@ -44,9 +44,9 @@ export class HomePage {
 
     this.fcm.onNotification().subscribe(data => {
       if (data.wasTapped) {
-        alert("Received in background" + JSON.stringify(data));
+        this.notifAlert();
       } else {
-        alert("Received in foreground" + JSON.stringify(data));
+        this.notifAlert();
       };
     });
     
@@ -64,6 +64,31 @@ export class HomePage {
     .then( () => {
       this.navCtrl.setRoot(LoginPage);
     });
+  }
+
+
+  notifAlert(){
+    let alert = this.alertCtrl.create({
+      title: 'Request!',
+      message: 'Do you want to accept?',
+      buttons: [
+        {
+          text: 'Accept',
+          handler: () => {
+            //save accept
+            this.notifProvider.storeAccept(this.uid);
+          }
+        },
+        {
+          text: 'Reject',
+          handler: () => {
+            //save reject
+            this.notifProvider.storeDecline(this.uid);
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
   userSelected(user){

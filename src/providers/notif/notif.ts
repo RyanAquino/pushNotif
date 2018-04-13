@@ -41,4 +41,19 @@ export class NotifProvider {
       }).subscribe();
   }
 
+
+  storeAccept(id){
+    return this.afdb.list(`request`).push({
+      user_id:id,
+      request:'accepted'
+    });
+  }
+
+  storeDecline(id){
+    return this.afdb.list(`request`).push({
+      user_id:id,
+      request:'declined'
+    });
+  }
+
 }
